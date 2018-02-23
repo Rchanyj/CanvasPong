@@ -1,0 +1,125 @@
+<!-- My first HTML5 canvas game!
+simple pong-like game -->
+
+<!-- v1.1 -->
+
+<canvas id='gc' width='640' height='480'></canvas>
+<script>
+//------------------------------------------------------
+// TODO: (Use v/ sign to mark completion) (Use <--- to indicate working on)
+// Change 'quick' variable names to clearer ones v/
+// Play around with values to see what happens
+// INVESTIGATE: at times AI paddle seems to "bounce" between two close y values, giving it a vibrating appearance
+// Features to be implemented:
+  //1. Max scores and 'GAME OVER, __ wins' screen displays
+  //2. Change ball shape from square to round circle; change sizes
+  //3. Add colour *v/; change text to make it clearer *<---; add background (display game name?) <---
+  //4. NEW GAME STATES - game grows more difficult the higher the scores (if they stay within a
+  //   certain range of each other); paddles shrink in length; ball speed increases; COLOURS change
+//------------------------------------------------------
+
+// Paddle dimensions:
+
+pad1y = pad2y = 40;
+padthick = 10;
+padheight = 120;
+
+aipadspeed = 2;
+
+// Ball dimensions:
+
+ballx = bally = 50;
+balldim = 10;
+xspeed = yspeed = 4;
+
+// Scores:
+
+score1 = score2 = 0;
+
+// Background text:
+
+title = 'Canvas Pong'
+level = 1;
+
+window.onload = function() {
+  c = document.getElementById('gc');
+  cc = c.getContext('2d');
+  setInterval(update, 1000/30);
+  c.addEventListener('mousemove', function(e) {
+    pad1y = e.clientY - padheight/2;
+  })
+}
+
+function reset() {
+  ballx = c.width / 2;
+  bally = c.height / 2;
+  xspeed = -xspeed;
+  yspeed = 4;
+}
+
+
+function update() {
+
+  // Ball motion:
+  ballx += xspeed;
+  bally += yspeed;
+
+  // Bounces:
+  if (bally < 0 && yspeed < 0) {
+    yspeed = -yspeed;
+  }
+  if (bally > c.height && yspeed > 0) {
+    yspeed = -yspeed;
+  }
+
+  //Sides:
+  if (ballx < 0) {
+    if (bally > pad1y && bally < pad1y + padheight) {
+      xspeed = -xspeed;
+      difficulty = bally - (pad1y + padheight/2);
+      yspeed = difficulty * 0.4;
+    } else {
+      score2++;
+      reset();
+    }
+  }
+
+  if (ballx > c.width) {
+    if (bally > pad2y && bally < pad2y + padheight) {
+      xspeed = -xspeed;
+      difficulty = bally - (pad2y + padheight/2);
+      yspeed = difficulty * 0.4;
+    } else {
+      score1++;
+      reset();
+    }
+  }
+
+  //AI (tracks ball):
+  if (pad2y + padheight/2 < bally) {
+    pad2y += aipadspeed;
+  } else {
+    pad2y -= aipadspeed;
+  }
+
+
+  cc.fillStyle = 'black';
+  cc.fillRect(0, 0, c.width, c.height);
+  cc.fillStyle = 'yellow';
+  cc.fillRect(0, pad1y, padthick, padheight);
+  cc.fillRect(c.width-padthick, pad2y, padthick, padheight);
+  cc.fillRect(ballx-balldim/2, bally-balldim/2, balldim, balldim);
+
+  cc.textAlign='center';
+  cc.font='20px Verdana';
+
+  cc.fillText(score1, 100, 100);
+  cc.fillText(score2, c.width - 100, 100);
+  cc.fillText(title, c.width/2, 100);
+
+}
+
+</script>
+
+
+
